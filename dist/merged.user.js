@@ -622,6 +622,8 @@ class AutoBootcamp extends ModernUtil {
         if (this.storage.load('ab_active', false)) this.toggle();
         if (this.storage.load('bootcamp_use_def', false)) this.triggerUseDef();
 
+	this.console.log("Initialised AutoBootcamp");
+
         // Attach the observer to the window open event
         uw.$.Observer(GameEvents.window.open).subscribe("modernAttackSpot", this.updateWindow);
     }
@@ -737,6 +739,7 @@ class AutoBootcamp extends ModernUtil {
         if (!this.use_def) {
             delete units.sword;
             delete units.archer;
+            delete units.chariot;
         }
 
         // If there are not enough units, return
@@ -745,6 +748,8 @@ class AutoBootcamp extends ModernUtil {
 
         // Send the attack
         this.postAttackBootcamp(units);
+        // print postAttackBootcamp event
+        this.console.log(`${uw.ITowns.towns[uw.Game.townId].getName()}: postAttackBootcamp ${units}`);
 
         return true;
     };
@@ -1823,7 +1828,7 @@ class AutoHide extends ModernUtil {
                 <div style="position: absolute; right: 10px; top: 4px; font-size: 10px;"> (click to toggle) </div>
             </div>
             <div style="padding: 5px; font-weight: 600">
-                Check every 5 seconds, if there is more then 15000 iron store it in the hide
+                Check every 5 seconds, if there is more then 1000 iron store it in the hide
             </div>    
         </div>
         `;
@@ -1861,7 +1866,7 @@ class AutoHide extends ModernUtil {
         if (this.activePolis == 0) return;
         const town = uw.ITowns.towns[this.activePolis];
         const { iron } = town.resources()
-        if (iron > 15000) {
+        if (iron > 1000) {
             this.storeIron(this.activePolis, iron)
         }
     }
