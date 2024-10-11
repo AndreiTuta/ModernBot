@@ -3,7 +3,7 @@
 // @name         ModernBot
 // @author       Sau1707
 // @description  A modern grepolis bot
-// @version      1.18.5
+// @version      1.18.6
 // @match        http://*.grepolis.com/game/*
 // @match        https://*.grepolis.com/game/*
 // @updateURL    https://github.com/Sau1707/ModernBot/blob/main/dist/merged.user.js
@@ -28,8 +28,7 @@ class ModernUtil {
 
     REQUIREMENTS = {
         sword: {},
-        archer: { building: 'barracks', research: 'archer' },
-        satyr: { building: 'barracks', mythic: true },
+        archer: { research: 'archer' },
         hoplite: { research: 'hoplite' },
         slinger: { research: 'slinger' },
         catapult: { research: 'catapult' },
@@ -623,8 +622,6 @@ class AutoBootcamp extends ModernUtil {
         if (this.storage.load('ab_active', false)) this.toggle();
         if (this.storage.load('bootcamp_use_def', false)) this.triggerUseDef();
 
-	    this.console.log("Initialised AutoBootcamp");
-
         // Attach the observer to the window open event
         uw.$.Observer(GameEvents.window.open).subscribe("modernAttackSpot", this.updateWindow);
     }
@@ -740,7 +737,6 @@ class AutoBootcamp extends ModernUtil {
         if (!this.use_def) {
             delete units.sword;
             delete units.archer;
-            delete units.satyr;
         }
 
         // If there are not enough units, return
@@ -749,8 +745,6 @@ class AutoBootcamp extends ModernUtil {
 
         // Send the attack
         this.postAttackBootcamp(units);
-        // print postAttackBootcamp event
-        this.console.log(`${uw.ITowns.towns[uw.Game.townId].getName()}: postAttackBootcamp ${Object.keys(units)}`);
 
         return true;
     };
@@ -1142,7 +1136,6 @@ class AutoBuild extends ModernUtil {
         if (!uw.GameDataPremium.isAdvisorActivated('curator') && town.buildingOrders().length >= 2) {
             return true;
         }
-        this.console.log(`Checking queue: ${town.buildingOrders()}`)
         return false;
     };
 
@@ -1557,7 +1550,6 @@ class AutoFarm extends ModernUtil {
             total.stone += stone;
             total.iron += iron;
             total.storage += storage;
-            // this.console.log(`${town.id}: [${total.storage}]`);
         }
 
         return total;
@@ -1746,7 +1738,6 @@ class AutoGratis extends ModernUtil {
             for (let model of town.buildingOrders().models) {
                 if (model.attributes.building_time < 300) {
                     this.callGratis(town.id, model.id);
-                    this.console.log(`${town.getName()} freeUpgrade Triggered: ${model.id}`)
                     return;
                 }
             }
@@ -1832,7 +1823,7 @@ class AutoHide extends ModernUtil {
                 <div style="position: absolute; right: 10px; top: 4px; font-size: 10px;"> (click to toggle) </div>
             </div>
             <div style="padding: 5px; font-weight: 600">
-                Check every 5 seconds, if there is more then 1000 iron store it in the hide
+                Check every 5 seconds, if there is more then 15000 iron store it in the hide
             </div>    
         </div>
         `;
@@ -1870,7 +1861,7 @@ class AutoHide extends ModernUtil {
         if (this.activePolis == 0) return;
         const town = uw.ITowns.towns[this.activePolis];
         const { iron } = town.resources()
-        if (iron > 1000) {
+        if (iron > 15000) {
             this.storeIron(this.activePolis, iron)
         }
     }
@@ -2621,13 +2612,12 @@ function autoTradeBot() {
 
 class AutoTrain extends ModernUtil {
     POWER_LIST = ['call_of_the_ocean', 'spartan_training', 'fertility_improvement'];
-    GROUND_ORDER = ['catapult', 'sword', 'archer', 'hoplite', 'slinger', 'rider', 'chariot', 'satyr'];
+    GROUND_ORDER = ['catapult', 'sword', 'archer', 'hoplite', 'slinger', 'rider', 'chariot'];
     NAVAL_ORDER = ['small_transporter', 'bireme', 'trireme', 'attack_ship', 'big_transporter', 'demolition_ship', 'colonize_ship'];
     SHIFT_LEVELS = {
         catapult: [5, 5],
         sword: [200, 50],
         archer: [200, 50],
-        satyr: [200, 50],
         hoplite: [200, 50],
         slinger: [200, 50],
         rider: [100, 25],
@@ -2793,6 +2783,7 @@ class AutoTrain extends ModernUtil {
         let town = uw.ITowns.towns[town_id];
         let researches = town.researches().attributes;
         let buildings = town.buildings().attributes;
+
         const isGray = troop => {
             if (!this.REQUIREMENTS.hasOwnProperty(troop)) {
                 return true; // Troop type not recognized
@@ -2843,7 +2834,6 @@ class AutoTrain extends ModernUtil {
             ${getTroopHtml('rider', [50, 350])}
             ${getTroopHtml('chariot', [200, 100])}
             ${getTroopHtml('catapult', [150, 150])}
-            ${getTroopHtml('satyr', [100, 350])}
 
             ${getTroopHtml('big_transporter', [0, 150])}
             ${getTroopHtml('small_transporter', [300, 350])}
@@ -3112,7 +3102,6 @@ class Compressor {
 		// Troops
 		sword: 'A',
 		archer: 'B',
-		satyr: 'S',
 		hoplite: 'C',
 		slinger: 'D',
 		rider: 'E',
@@ -3585,7 +3574,7 @@ class ModernBot {
                     render: this.console.renderSettings,
                 },
             ],
-            start_tab: 4,
+            start_tab: 0,
         });
 
         this.setup();
